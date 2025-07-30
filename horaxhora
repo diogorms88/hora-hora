@@ -1200,11 +1200,11 @@
             <tr>
               <th>Modelo + Cor</th>
               <th>Primer (ml)</th>
+              <th>Diluente do Primer (ml)</th>
               <th>Base (ml)</th>
+              <th>Diluente da Base (ml)</th>
               <th>Verniz (ml)</th>
-              <th>Diluente X (ml)</th>
-              <th>Diluente Y (ml)</th>
-              <th>Diluente Z (ml)</th>
+              <th>Diluente do Verniz (ml)</th>
               <th>Catalisador (ml)</th>
               <th>Total/Peça (ml)</th>
               <th id="acoesPPF" style="display: none;">Ações</th>
@@ -1236,13 +1236,30 @@
         <!-- Tab Configuração Geral -->
         <div id="config-geral" class="config-tab-content active">
           <div class="config-section">
-            <h3>🎨 Configurações Gerais de Diluição</h3>
-            <p style="color: #666; margin-bottom: 15px;">Configure as taxas de diluição e tipos de diluente para cada material. Os consumos por peça são configurados nas configurações específicas.</p>
+            <h3>🎨 Configurações Gerais de Consumo</h3>
+            <p style="color: #666; margin-bottom: 15px;">Configure os consumos padrão e taxas de diluição para cada material. O primer tem consumo fixo por peça, a base varia por cor, e o verniz é calculado por volume total aplicado.</p>
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #1976d2;">
+              <h4 style="margin: 0 0 10px 0; color: #1976d2;">📋 Sistema de Cálculo:</h4>
+              <ul style="margin: 0; padding-left: 20px; color: #666;">
+                <li><strong>Valores Configurados:</strong> São os consumos TOTAIS já diluídos por peça</li>
+                <li><strong>Tabela PPF:</strong> Separa automaticamente em material puro + diluente</li>  
+                <li><strong>Primer/Base:</strong> Valor total ÷ (1 + taxa%) = parte pura</li>
+                <li><strong>Verniz:</strong> Volume total dividido entre puro + diluente + catalisador</li>
+              </ul>
+              <div style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 3px solid #ffc107;">
+                <strong>💡 Exemplo:</strong> Se Primer = 300ml com 30% diluição → PPF mostra: 231ml puro + 69ml diluente = 300ml total
+              </div>
+            </div>
             
             <div class="config-row">
               <div class="config-field">
                 <label for="primerDiluicao">Taxa de diluição Primer (%)</label>
                 <input type="number" id="primerDiluicao" value="30" min="0" max="100">
+              </div>
+              <div class="config-field">
+                <label for="primerConsumo">Consumo TOTAL Primer por peça (ml)</label>
+                <input type="number" id="primerConsumo" value="300" min="0">
+                <small style="color: #666; font-size: 12px;">Valor já diluído que sai do robô</small>
               </div>
               <div class="config-field">
                 <label for="primerDiluente">Tipo de diluente Primer</label>
@@ -1260,6 +1277,11 @@
                 <input type="number" id="baseDiluicao" value="30" min="0" max="100">
               </div>
               <div class="config-field">
+                <label for="baseConsumo">Consumo TOTAL Base por peça (ml)</label>
+                <input type="number" id="baseConsumo" value="300" min="0">
+                <small style="color: #666; font-size: 12px;">Valor já diluído que sai do robô</small>
+              </div>
+              <div class="config-field">
                 <label for="baseDiluente">Tipo de diluente Base</label>
                 <select id="baseDiluente">
                   <option value="X">Diluente X</option>
@@ -1275,16 +1297,24 @@
                 <input type="number" id="vernizDiluicao" value="30" min="0" max="100">
               </div>
               <div class="config-field">
+                <label for="vernizCatalisador">Taxa de catalisador Verniz (%)</label>
+                <input type="number" id="vernizCatalisador" value="27" min="0" max="100">
+              </div>
+            </div>
+
+            <div class="config-row">
+              <div class="config-field">
+                <label for="vernizTotal">Volume TOTAL Verniz por peça (ml)</label>
+                <input type="number" id="vernizTotal" value="450" min="0">
+                <small style="color: #666; font-size: 12px;">Volume completo já com diluente e catalisador</small>
+              </div>
+              <div class="config-field">
                 <label for="vernizDiluente">Tipo de diluente Verniz</label>
                 <select id="vernizDiluente">
                   <option value="X">Diluente X</option>
                   <option value="Y">Diluente Y</option>
                   <option value="Z">Diluente Z</option>
                 </select>
-              </div>
-              <div class="config-field">
-                <label for="vernizCatalisador">Taxa de catalisador Verniz (%)</label>
-                <input type="number" id="vernizCatalisador" value="27" min="0" max="100">
               </div>
             </div>
           </div>
@@ -1341,99 +1371,7 @@
       </div>
     </div>
   </div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>⚙️ Configurações de Consumo</h2>
-        <button class="close-button" onclick="fecharModalConfig()">×</button>
-      </div>
-      
-      <!-- Tabs de Configuração -->
-      <div class="config-tabs">
-        <button class="config-tab active" onclick="mostrarConfigTab('geral')">🎨 Configuração Geral</button>
-        <button class="config-tab" onclick="mostrarConfigTab('especificas')">🔧 Configurações Específicas</button>
-      </div>
-
-      <form class="config-form" id="formConfig">
-        <!-- Tab Configuração Geral -->
-        <div id="config-geral" class="config-tab-content active">
-          <div class="config-section">
-            <h3>🎨 Configurações Gerais de Diluição</h3>
-            <p style="color: #666; margin-bottom: 15px;">Configure as taxas de diluição e tipos de diluente para cada material. Os consumos por peça são configurados nas configurações específicas.</p>
-            
-            <div class="config-row">
-              <div class="config-field">
-                <label for="primerDiluicao">Taxa de diluição Primer (%)</label>
-                <input type="number" id="primerDiluicao" value="30" min="0" max="100">
-              </div>
-              <div class="config-field">
-                <label for="primerDiluente">Tipo de diluente Primer</label>
-                <select id="primerDiluente">
-                  <option value="X">Diluente X</option>
-                  <option value="Y">Diluente Y</option>
-                  <option value="Z">Diluente Z</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="config-row">
-              <div class="config-field">
-                <label for="baseDiluicao">Taxa de diluição Base (%)</label>
-                <input type="number" id="baseDiluicao" value="30" min="0" max="100">
-              </div>
-              <div class="config-field">
-                <label for="baseDiluente">Tipo de diluente Base</label>
-                <select id="baseDiluente">
-                  <option value="X">Diluente X</option>
-                  <option value="Y">Diluente Y</option>
-                  <option value="Z">Diluente Z</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="config-row">
-              <div class="config-field">
-                <label for="vernizDiluicao">Taxa de diluição Verniz (%)</label>
-                <input type="number" id="vernizDiluicao" value="30" min="0" max="100">
-              </div>
-              <div class="config-field">
-                <label for="vernizDiluente">Tipo de diluente Verniz</label>
-                <select id="vernizDiluente">
-                  <option value="X">Diluente X</option>
-                  <option value="Y">Diluente Y</option>
-                  <option value="Z">Diluente Z</option>
-                </select>
-              </div>
-              <div class="config-field">
-                <label for="vernizCatalisador">Taxa de catalisador Verniz (%)</label>
-                <input type="number" id="vernizCatalisador" value="27" min="0" max="100">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab Configurações Específicas -->
-        <div id="config-especificas" class="config-tab-content">
-          <div class="config-section">
-            <h3>🔧 Configurações Específicas por Modelo e Cor</h3>
-            <p style="color: #666; margin-bottom: 15px;">Configure o consumo específico de cada material por modelo e cor. Deixe em branco para usar valores padrão.</p>
-            
-            <div id="configEspecificasContainer">
-              <!-- Será preenchido dinamicamente -->
-            </div>
-            
-            <button type="button" class="add-config-btn" onclick="adicionarConfiguracao()">
-              ➕ Adicionar Nova Configuração
-            </button>
-          </div>
-        </div>
-
-        <button type="button" class="save-config-button" onclick="salvarConfiguracoes()">
-          💾 Salvar Configurações
-        </button>
-      </form>
-    </div>
-  </div>
-
+ 
   <!-- Seção de Lançamento de Dados -->
   <div class="data-entry-section" id="dataEntrySection">
     <h2>📋 Registro Hora a Hora</h2>
@@ -1531,9 +1469,9 @@
     let sparklineCharts = {};
     let configuracaoConsumo = {
       geral: {
-        primer: { taxa_diluicao: 30, diluente: 'X', taxa_catalisador: 0 },
-        base: { taxa_diluicao: 30, diluente: 'Y', taxa_catalisador: 0 },
-        verniz: { taxa_diluicao: 30, diluente: 'Z', taxa_catalisador: 27 }
+        primer: { taxa_diluicao: 30, consumo: 300, diluente: 'X' },
+        base: { taxa_diluicao: 30, consumo: 300, diluente: 'Y' },
+        verniz: { taxa_diluicao: 30, taxa_catalisador: 27, volume_total: 450, diluente: 'Z' }
       },
       especificas: [],
       ppf: [] // Lista de combinações modelo+cor para mostrar na PPF
@@ -1637,6 +1575,47 @@
       } else {
         return { pch: quantidade, componentes: 0 };
       }
+    }
+
+    // Calcular componentes do verniz baseado no volume total
+    function calcularVerniz(volumeTotal, taxaDiluicao, taxaCatalisador) {
+      // Formula: verniz_puro × (1 + taxa_diluicao + (1 + taxa_diluicao) × taxa_catalisador) = volume_total
+      const fatorMultiplicador = 1 + (taxaDiluicao / 100) + (1 + (taxaDiluicao / 100)) * (taxaCatalisador / 100);
+      const vernizPuro = volumeTotal / fatorMultiplicador;
+      const diluenteVerniz = vernizPuro * (taxaDiluicao / 100);
+      const catalisador = (vernizPuro + diluenteVerniz) * (taxaCatalisador / 100);
+      
+      return {
+        puro: vernizPuro,
+        diluente: diluenteVerniz,
+        catalisador: catalisador
+      };
+    }
+
+    // Obter consumo específico considerando configurações específicas
+    function obterConsumo(tipo, modelo, cor) {
+      // Buscar configuração específica para este modelo e cor
+      const configEspecifica = configuracaoConsumo.especificas.find(c => 
+        c.modelo === modelo && c.cor === cor && c[tipo]
+      );
+      
+      if (configEspecifica && configEspecifica[tipo]) {
+        return parseFloat(configEspecifica[tipo]);
+      }
+      
+      // Usar valor da configuração geral
+      if (configuracaoConsumo.geral[tipo] && configuracaoConsumo.geral[tipo].consumo) {
+        return configuracaoConsumo.geral[tipo].consumo;
+      }
+      
+      // Valor padrão se não houver configuração
+      const valoresPadrao = {
+        primer: 300,
+        base: 300,
+        verniz: 450 // Volume total do verniz
+      };
+      
+      return valoresPadrao[tipo] || 300;
     }
 
     // Função principal de inicialização
@@ -1850,10 +1829,8 @@
             ...configData.configuracao
           };
           
-          // Garantir que ppf existe
-          if (!configuracaoConsumo.ppf) {
-            configuracaoConsumo.ppf = [];
-          }
+          // Migrar configurações antigas se necessário
+          migrarConfiguracoes();
           
           console.log('Configurações carregadas do Supabase');
           return;
@@ -1872,10 +1849,8 @@
             ...parsedConfig
           };
           
-          // Garantir que ppf existe
-          if (!configuracaoConsumo.ppf) {
-            configuracaoConsumo.ppf = [];
-          }
+          // Migrar configurações antigas se necessário
+          migrarConfiguracoes();
           
           console.log('Configurações carregadas do localStorage');
         } catch (error) {
@@ -1889,25 +1864,23 @@
       }
     }
 
-    // Obter consumo específico considerando configurações específicas
-    function obterConsumo(tipo, modelo, cor) {
-      // Buscar configuração específica para este modelo e cor
-      const configEspecifica = configuracaoConsumo.especificas.find(c => 
-        c.modelo === modelo && c.cor === cor && c[tipo]
-      );
-      
-      if (configEspecifica && configEspecifica[tipo]) {
-        return parseFloat(configEspecifica[tipo]);
+    // Migrar configurações antigas para nova estrutura
+    function migrarConfiguracoes() {
+      // Garantir que todos os campos existem
+      if (!configuracaoConsumo.geral.primer.diluente) {
+        configuracaoConsumo.geral.primer.diluente = 'X';
+      }
+      if (!configuracaoConsumo.geral.base.diluente) {
+        configuracaoConsumo.geral.base.diluente = 'Y';
+      }
+      if (!configuracaoConsumo.geral.verniz.diluente) {
+        configuracaoConsumo.geral.verniz.diluente = 'Z';
       }
       
-      // Usar valor padrão se não houver configuração específica
-      const valoresPadrao = {
-        primer: 300,
-        base: 300,
-        verniz: 300
-      };
-      
-      return valoresPadrao[tipo] || 300;
+      // Garantir que ppf existe
+      if (!configuracaoConsumo.ppf) {
+        configuracaoConsumo.ppf = [];
+      }
     }
 
     // Abrir modal de configuração
@@ -1919,14 +1892,17 @@
       
       // Preencher campos com valores atuais
       document.getElementById('primerDiluicao').value = configuracaoConsumo.geral.primer.taxa_diluicao;
-      document.getElementById('primerDiluente').value = configuracaoConsumo.geral.primer.diluente;
+      document.getElementById('primerConsumo').value = configuracaoConsumo.geral.primer.consumo;
+      document.getElementById('primerDiluente').value = configuracaoConsumo.geral.primer.diluente || 'X';
       
       document.getElementById('baseDiluicao').value = configuracaoConsumo.geral.base.taxa_diluicao;
-      document.getElementById('baseDiluente').value = configuracaoConsumo.geral.base.diluente;
+      document.getElementById('baseConsumo').value = configuracaoConsumo.geral.base.consumo;
+      document.getElementById('baseDiluente').value = configuracaoConsumo.geral.base.diluente || 'Y';
       
       document.getElementById('vernizDiluicao').value = configuracaoConsumo.geral.verniz.taxa_diluicao;
-      document.getElementById('vernizDiluente').value = configuracaoConsumo.geral.verniz.diluente;
       document.getElementById('vernizCatalisador').value = configuracaoConsumo.geral.verniz.taxa_catalisador;
+      document.getElementById('vernizTotal').value = configuracaoConsumo.geral.verniz.volume_total;
+      document.getElementById('vernizDiluente').value = configuracaoConsumo.geral.verniz.diluente || 'Z';
       
       // Mostrar configurações específicas
       gerarConfigEspecificas();
@@ -1949,14 +1925,17 @@
       try {
         // Atualizar configurações gerais
         configuracaoConsumo.geral.primer.taxa_diluicao = parseFloat(document.getElementById('primerDiluicao').value);
+        configuracaoConsumo.geral.primer.consumo = parseFloat(document.getElementById('primerConsumo').value);
         configuracaoConsumo.geral.primer.diluente = document.getElementById('primerDiluente').value;
         
         configuracaoConsumo.geral.base.taxa_diluicao = parseFloat(document.getElementById('baseDiluicao').value);
+        configuracaoConsumo.geral.base.consumo = parseFloat(document.getElementById('baseConsumo').value);
         configuracaoConsumo.geral.base.diluente = document.getElementById('baseDiluente').value;
         
         configuracaoConsumo.geral.verniz.taxa_diluicao = parseFloat(document.getElementById('vernizDiluicao').value);
-        configuracaoConsumo.geral.verniz.diluente = document.getElementById('vernizDiluente').value;
         configuracaoConsumo.geral.verniz.taxa_catalisador = parseFloat(document.getElementById('vernizCatalisador').value);
+        configuracaoConsumo.geral.verniz.volume_total = parseFloat(document.getElementById('vernizTotal').value);
+        configuracaoConsumo.geral.verniz.diluente = document.getElementById('vernizDiluente').value;
         
         await salvarConfiguracoesSupabase();
         
@@ -2146,42 +2125,80 @@
             const tiposParaCalcular = p.cor === 'Primer P&A' ? ['primer'] : ['primer', 'base', 'verniz'];
             
             tiposParaCalcular.forEach(tipo => {
-              const consumoMl = obterConsumo(tipo, p.modelo, p.cor);
-              const configGeral = configuracaoConsumo.geral[tipo];
+              let consumoMl, configGeral, puro, diluente, catalisador = 0;
               
-              const consumoTotal = (p.qtd * consumoMl) / 1000; // Converter para litros
-              const taxaDiluicao = configGeral.taxa_diluicao / 100;
-              const taxaCatalisador = configGeral.taxa_catalisador / 100;
-              
-              const puro = consumoTotal / (1 + taxaDiluicao + taxaCatalisador);
-              const diluente = puro * taxaDiluicao;
-              const catalisador = puro * taxaCatalisador;
+              if (tipo === 'primer') {
+                consumoMl = obterConsumo('primer', p.modelo, p.cor);
+                configGeral = configuracaoConsumo.geral.primer;
+                const consumoTotal = (p.qtd * consumoMl) / 1000; // Converter para litros
+                const taxaDiluicao = configGeral.taxa_diluicao / 100;
+                
+                puro = consumoTotal / (1 + taxaDiluicao);
+                diluente = puro * taxaDiluicao;
+                
+              } else if (tipo === 'base') {
+                consumoMl = obterConsumo('base', p.modelo, p.cor);
+                configGeral = configuracaoConsumo.geral.base;
+                const consumoTotal = (p.qtd * consumoMl) / 1000; // Converter para litros
+                const taxaDiluicao = configGeral.taxa_diluicao / 100;
+                
+                puro = consumoTotal / (1 + taxaDiluicao);
+                diluente = puro * taxaDiluicao;
+                
+              } else if (tipo === 'verniz') {
+                // Para verniz, usar o volume total configurado
+                const volumeTotalVerniz = configuracaoConsumo.geral.verniz.volume_total;
+                const vernizCalculado = calcularVerniz(
+                  volumeTotalVerniz,
+                  configuracaoConsumo.geral.verniz.taxa_diluicao,
+                  configuracaoConsumo.geral.verniz.taxa_catalisador
+                );
+                
+                const consumoTotal = (p.qtd * volumeTotalVerniz) / 1000; // Converter para litros
+                const fatorConversao = consumoTotal / volumeTotalVerniz;
+                
+                puro = vernizCalculado.puro * fatorConversao;
+                diluente = vernizCalculado.diluente * fatorConversao;
+                catalisador = vernizCalculado.catalisador * fatorConversao;
+                configGeral = configuracaoConsumo.geral.verniz;
+              }
               
               consumoPorModeloCor[chave].consumo[tipo].puro += puro;
               consumoPorModeloCor[chave].consumo[tipo].diluente += diluente;
               consumoPorModeloCor[chave].consumo[tipo].catalisador += catalisador;
               
               resumoTotal[tipo].puro += puro;
-              if (configGeral.diluente === 'X') {
-                resumoTotal[tipo].diluenteX += diluente;
-              } else if (configGeral.diluente === 'Y') {
-                resumoTotal[tipo].diluenteY += diluente;
-              } else if (configGeral.diluente === 'Z') {
-                resumoTotal[tipo].diluenteZ += diluente;
+              
+              // Para o resumo total, usar o tipo de diluente configurado
+              if (configGeral && configGeral.diluente) {
+                if (configGeral.diluente === 'X') {
+                  resumoTotal[tipo].diluenteX += diluente;
+                } else if (configGeral.diluente === 'Y') {
+                  resumoTotal[tipo].diluenteY += diluente;
+                } else if (configGeral.diluente === 'Z') {
+                  resumoTotal[tipo].diluenteZ += diluente;
+                }
               }
-              resumoTotal[tipo].catalisador += catalisador;
+              
+              if (tipo === 'verniz') {
+                resumoTotal[tipo].catalisador += catalisador;
+              }
               
               // Acumular por cor específica
               if (resumoPorCor[p.cor] && resumoPorCor[p.cor][tipo]) {
                 resumoPorCor[p.cor][tipo].puro += puro;
-                if (configGeral.diluente === 'X') {
-                  resumoPorCor[p.cor][tipo].diluenteX += diluente;
-                } else if (configGeral.diluente === 'Y') {
-                  resumoPorCor[p.cor][tipo].diluenteY += diluente;
-                } else if (configGeral.diluente === 'Z') {
-                  resumoPorCor[p.cor][tipo].diluenteZ += diluente;
+                
+                if (configGeral && configGeral.diluente) {
+                  if (configGeral.diluente === 'X') {
+                    resumoPorCor[p.cor][tipo].diluenteX += diluente;
+                  } else if (configGeral.diluente === 'Y') {
+                    resumoPorCor[p.cor][tipo].diluenteY += diluente;
+                  } else if (configGeral.diluente === 'Z') {
+                    resumoPorCor[p.cor][tipo].diluenteZ += diluente;
+                  }
                 }
-                if (resumoPorCor[p.cor][tipo].catalisador !== undefined) {
+                
+                if (tipo === 'verniz' && resumoPorCor[p.cor][tipo].catalisador !== undefined) {
                   resumoPorCor[p.cor][tipo].catalisador += catalisador;
                 }
               }
@@ -2264,24 +2281,25 @@
       container.appendChild(cardTop5Cores);
       
       // Card Consumo Total
+      const diluentesTotal = (resumo.primer.diluenteX || 0) + (resumo.primer.diluenteY || 0) + (resumo.primer.diluenteZ || 0) +
+                            (resumo.base.diluenteX || 0) + (resumo.base.diluenteY || 0) + (resumo.base.diluenteZ || 0) +
+                            (resumo.verniz.diluenteX || 0) + (resumo.verniz.diluenteY || 0) + (resumo.verniz.diluenteZ || 0);
+      
       const consumoTotal = resumo.primer.puro + resumo.base.puro + resumo.verniz.puro +
-                          resumo.primer.diluenteX + resumo.primer.diluenteY + resumo.primer.diluenteZ +
-                          resumo.base.diluenteX + resumo.base.diluenteY + resumo.base.diluenteZ +
-                          resumo.verniz.diluenteX + resumo.verniz.diluenteY + resumo.verniz.diluenteZ +
-                          resumo.primer.catalisador + resumo.base.catalisador + resumo.verniz.catalisador;
+                          diluentesTotal + resumo.primer.catalisador + resumo.base.catalisador + resumo.verniz.catalisador;
       
       const cardConsumoTotal = criarCardConsumo('🎨 Consumo Total', [
         { label: 'Volume Total', value: `${consumoTotal.toFixed(2)} L` },
         { label: 'Material Puro', value: `${(resumo.primer.puro + resumo.base.puro + resumo.verniz.puro).toFixed(2)} L` },
-        { label: 'Diluentes', value: `${(resumo.primer.diluenteX + resumo.primer.diluenteY + resumo.primer.diluenteZ + resumo.base.diluenteX + resumo.base.diluenteY + resumo.base.diluenteZ + resumo.verniz.diluenteX + resumo.verniz.diluenteY + resumo.verniz.diluenteZ).toFixed(2)} L` },
+        { label: 'Diluentes', value: `${diluentesTotal.toFixed(2)} L` },
         { label: 'Catalisador', value: `${(resumo.verniz.catalisador).toFixed(2)} L` }
       ]);
       container.appendChild(cardConsumoTotal);
       
       // Card Diluentes
-      const totalDiluenteX = resumo.primer.diluenteX + resumo.base.diluenteX + resumo.verniz.diluenteX;
-      const totalDiluenteY = resumo.primer.diluenteY + resumo.base.diluenteY + resumo.verniz.diluenteY;
-      const totalDiluenteZ = resumo.primer.diluenteZ + resumo.base.diluenteZ + resumo.verniz.diluenteZ;
+      const totalDiluenteX = (resumo.primer.diluenteX || 0) + (resumo.base.diluenteX || 0) + (resumo.verniz.diluenteX || 0);
+      const totalDiluenteY = (resumo.primer.diluenteY || 0) + (resumo.base.diluenteY || 0) + (resumo.verniz.diluenteY || 0);
+      const totalDiluenteZ = (resumo.primer.diluenteZ || 0) + (resumo.base.diluenteZ || 0) + (resumo.verniz.diluenteZ || 0);
       
       const cardDiluentes = criarCardConsumo('🧪 Consumo de Diluentes', [
         { label: 'Diluente X', value: `${totalDiluenteX.toFixed(2)} L` },
@@ -2678,40 +2696,37 @@
         const modelo = item.modelo;
         const cor = item.cor;
         
-        // Calcular consumos
-        const consumoPrimer = obterConsumo('primer', modelo, cor);
-        const consumoBase = obterConsumo('base', modelo, cor);
-        const consumoVerniz = obterConsumo('verniz', modelo, cor);
-        
+        // Obter configurações
         const configPrimer = configuracaoConsumo.geral.primer;
         const configBase = configuracaoConsumo.geral.base;
         const configVerniz = configuracaoConsumo.geral.verniz;
         
-        // Calcular diluentes e catalisador
-        const diluentePrimer = (consumoPrimer * configPrimer.taxa_diluicao) / 100;
-        const diluenteBase = (consumoBase * configBase.taxa_diluicao) / 100;
-        const diluenteVerniz = (consumoVerniz * configVerniz.taxa_diluicao) / 100;
-        const catalisador = (consumoVerniz * configVerniz.taxa_catalisador) / 100;
+        // Calcular consumos totais configurados (já incluem diluição)
+        const consumoTotalPrimer = obterConsumo('primer', modelo, cor);
+        const consumoTotalBase = obterConsumo('base', modelo, cor);
         
-        let diluenteX = 0, diluenteY = 0, diluenteZ = 0;
+        // Calcular partes puras (removendo a diluição)
+        const consumoPrimerPuro = consumoTotalPrimer / (1 + (configPrimer.taxa_diluicao / 100));
+        const diluentePrimer = consumoPrimerPuro * (configPrimer.taxa_diluicao / 100);
         
-        // Somar diluentes por tipo
-        if (configPrimer.diluente === 'X') diluenteX += diluentePrimer;
-        else if (configPrimer.diluente === 'Y') diluenteY += diluentePrimer;
-        else if (configPrimer.diluente === 'Z') diluenteZ += diluentePrimer;
+        const consumoBasePuro = consumoTotalBase / (1 + (configBase.taxa_diluicao / 100));
+        const diluenteBase = consumoBasePuro * (configBase.taxa_diluicao / 100);
         
-        if (cor !== 'Primer P&A') {
-          if (configBase.diluente === 'X') diluenteX += diluenteBase;
-          else if (configBase.diluente === 'Y') diluenteY += diluenteBase;
-          else if (configBase.diluente === 'Z') diluenteZ += diluenteBase;
-          
-          if (configVerniz.diluente === 'X') diluenteX += diluenteVerniz;
-          else if (configVerniz.diluente === 'Y') diluenteY += diluenteVerniz;
-          else if (configVerniz.diluente === 'Z') diluenteZ += diluenteVerniz;
-        }
+        // Calcular verniz com a nova fórmula
+        const volumeTotalVerniz = configVerniz.volume_total;
+        const vernizCalculado = calcularVerniz(
+          volumeTotalVerniz, 
+          configVerniz.taxa_diluicao, 
+          configVerniz.taxa_catalisador
+        );
         
-        const totalPorPeca = (cor === 'Primer P&A' ? consumoPrimer + diluentePrimer : 
-                             consumoPrimer + consumoBase + consumoVerniz + diluenteX + diluenteY + diluenteZ + catalisador);
+        // Para "Primer P&A", não usa base nem verniz
+        const usaBase = cor !== 'Primer P&A';
+        const usaVerniz = cor !== 'Primer P&A';
+        
+        const totalPorPeca = consumoPrimerPuro + diluentePrimer + 
+                            (usaBase ? consumoBasePuro + diluenteBase : 0) +
+                            (usaVerniz ? vernizCalculado.puro + vernizCalculado.diluente + vernizCalculado.catalisador : 0);
         
         const tr = document.createElement('tr');
         
@@ -2722,13 +2737,13 @@
         
         tr.innerHTML = `
           <td>${modelo} - ${cor}</td>
-          <td>${consumoPrimer.toFixed(1)}</td>
-          <td>${cor === 'Primer P&A' ? '0.0' : consumoBase.toFixed(1)}</td>
-          <td>${cor === 'Primer P&A' ? '0.0' : consumoVerniz.toFixed(1)}</td>
-          <td>${diluenteX.toFixed(1)}</td>
-          <td>${diluenteY.toFixed(1)}</td>
-          <td>${diluenteZ.toFixed(1)}</td>
-          <td>${catalisador.toFixed(1)}</td>
+          <td>${consumoPrimerPuro.toFixed(1)}</td>
+          <td>${diluentePrimer.toFixed(1)}</td>
+          <td>${usaBase ? consumoBasePuro.toFixed(1) : '0.0'}</td>
+          <td>${usaBase ? diluenteBase.toFixed(1) : '0.0'}</td>
+          <td>${usaVerniz ? vernizCalculado.puro.toFixed(1) : '0.0'}</td>
+          <td>${usaVerniz ? vernizCalculado.diluente.toFixed(1) : '0.0'}</td>
+          <td>${usaVerniz ? vernizCalculado.catalisador.toFixed(1) : '0.0'}</td>
           <td><strong>${totalPorPeca.toFixed(1)}</strong></td>
           ${acaoBtn}
         `;
